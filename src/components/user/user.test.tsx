@@ -1,9 +1,9 @@
 import { render, screen } from '@test-utils';
-import { Welcome } from './welcome';
+import { User } from './user';
 
 describe('Welcome component', () => {
   it('has correct Vite guide link', () => {
-    render(<Welcome />);
+    render(<User />);
     expect(screen.getByText('this guide')).toHaveAttribute(
       'href',
       'https://mantine.dev/guides/vite/'
