@@ -1,73 +1,53 @@
 import { useDisclosure } from '@mantine/hooks';
-import { AppShell, Burger, Group, Skeleton, ScrollArea, Text, Avatar, Image, Tabs, UnstyledButton, Badge, Divider } from '@mantine/core';
+import { AppShell, Burger, Group, ScrollArea, Text, Avatar, Image, Badge, Divider, NavLink } from '@mantine/core';
 import { MantineLogo } from '@mantine/ds';
-import { IconSettings, IconLogout, IconSwitchHorizontal, IconUsers, IconBulb, IconUser, IconCheckbox, IconList, IconSearch, IconPlus } from '@tabler/icons-react';
-import { Outlet } from 'react-router-dom';
+import { IconCalendar, IconSettings, IconLogout, IconSwitchHorizontal, IconUsers, IconBulb, IconUser, IconCheckbox } from '@tabler/icons-react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import logo from '../public/raise-group.png';
 import classes from './app.page.module.css';
 import { UserNav } from '../components/user-nav/user-nav';
 
 const applinks = [
-    { icon: IconUser, label: 'Me' },
-    { icon: IconBulb, label: 'Activity', notifications: 3 },
-    { icon: IconCheckbox, label: 'Tasks', notifications: 4 },
-];
-
-const syslinks = [
+    { icon: IconUser, label: 'Me', link: '/my/home' },
+    { icon: IconBulb, label: 'Activity', notifications: 3, link: '/my/activity' },
+    { icon: IconCheckbox, label: 'Tasks', notifications: 4, link: '/my/tasks' },
+    { icon: IconCalendar, label: 'Schedule', link: '/my/schedule' },
+    { divider: true },
+    { icon: IconUsers, label: 'Personel', link: '/my/personel' },
+    { icon: IconUsers, label: 'Clients', link: '/my/clients' },
+    { divider: true },
     { icon: IconSettings, label: 'Settings' },
     { icon: IconSwitchHorizontal, label: 'Switch Account' },
     { icon: IconLogout, label: 'Logoff' },
 ];
 
-const links = [
-    { icon: IconUsers, label: 'Contacts' },
-];
-
 export function AppplicationShell() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const [active, setActive] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const appLinks = applinks.map((link) => (
-    <UnstyledButton key={link.label} className={classes.mainLink}>
-      <div className={classes.mainLinkInner}>
-        <link.icon size={22} className={classes.mainLinkIcon} stroke={1.5} />
-        <span>{link.label}</span>
-      </div>
-      {link.notifications && (
-        <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
-          {link.notifications}
-        </Badge>
-      )}
-    </UnstyledButton>
-  ));
+  const appLinks = applinks.map((item, index) => {
+    if (item.divider) return <Divider mb={5} mt={5} />;
 
-  const mainLinks = links.map((link) => (
-    <UnstyledButton key={link.label} className={classes.mainLink}>
-      <div className={classes.mainLinkInner}>
-        <link.icon size={22} className={classes.mainLinkIcon} stroke={1.5} />
-        <span>{link.label}</span>
-      </div>
-      {link.notifications && (
-        <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
-          {link.notifications}
-        </Badge>
-      )}
-    </UnstyledButton>
-  ));
-
-  const systemlinks = syslinks.map((link) => (
-    <UnstyledButton key={link.label} className={classes.mainLink}>
-      <div className={classes.mainLinkInner}>
-        <link.icon size={22} className={classes.mainLinkIcon} stroke={1.5} />
-        <span>{link.label}</span>
-      </div>
-      {link.notifications && (
-        <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
-          {link.notifications}
-        </Badge>
-      )}
-    </UnstyledButton>
-  ));
+    return <NavLink
+      key={item.label}
+      label={item.label}
+      active={item.link ? item.link.indexOf(location.pathname) > -1 : undefined}
+      leftSection={<item.icon size="1.3rem" stroke={1.5} />}
+      rightSection={item.notifications && (
+            <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
+              {item.notifications}
+            </Badge>
+          )}
+      onClick={() => {
+        if (item.link) navigate(item.link);
+        setActive(index);
+      }}
+    />;
+  });
 
   return (
     <AppShell
@@ -89,35 +69,23 @@ export function AppplicationShell() {
             </Group>
             <UserNav />
             <Group justify="flex-end">
-                    <Image
-                        h={25}
-                        w="auto"
-                        fit="contain"
-                        src={logo}
-                    />
-                    <Text tt="uppercase" size="xs">Raise Group</Text>
+              <Image
+                h={25}
+                w="auto"
+                fit="contain"
+                src={logo}
+              />
+              <Text tt="uppercase" size="xs">Raise Group</Text>
             </Group>
-
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        <AppShell.Section>
-            <div className={classes.mainLinks}>{appLinks}</div>
+        <AppShell.Section mt={5} mb={5} component={ScrollArea}>
+          <div className={classes.mainLinks}>{appLinks}</div>
         </AppShell.Section>
-        <Divider pt={10} pb={10} />
-        <AppShell.Section grow my="md" component={ScrollArea}>
-            <div className={classes.mainLinks}>{mainLinks}</div>
-            {Array(60)
-            .fill(0)
-            .map((_, index) => (
-                <Skeleton key={index} h={28} mt="sm" animate={false} />
-            ))}
-        </AppShell.Section>
-        <Divider mt="10" mb="10" />
-        <AppShell.Section pb="md">
-            <div className={classes.mainLinks}>{systemlinks}</div>
-        </AppShell.Section>
-        <AppShell.Section>
+        <AppShell.Section grow mt={5} mb={5} />
+        <Divider />
+        <AppShell.Section mt={10}>
             <Group justify="space-between">
                 <MantineLogo size={15} />
                 <Text size="xs">ver. 1.0.0</Text>

@@ -1,28 +1,46 @@
 import { Group } from '@mantine/core';
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import classes from './user-nav.module.css';
 
 const userlinks = [
-  { link: '/me/home', label: 'Home' },
-  { link: '/me/user', label: 'User' },
+  { link: '/my/home', label: 'Home' },
+  { link: '/my/schedule', label: 'Schedule' },
+  { link: '/my/activity', label: 'Activity' },
+  { link: '/my/tasks', label: 'Tasks' },
+  { link: '/my/personel', label: 'Personel' },
+  { link: '/my/clients', label: 'Clients' },
 ];
 
 export function UserNav() {
-  const [active, setActive] = useState(userlinks[0].link);
-
-  const navItems = userlinks.map((link) => (
+  const [active, setActive] = useState(0);
+  const location = useLocation();
+  
+  const navItems = userlinks.map((item, index) => (
     <NavLink
-      to={link.link}
+      key={item.label}
+      to={item.link}
       className={classes.link}
       onClick={() => {
-        setActive(link.link);
+        setActive(index);
       }}
-      data-active={active === link.link || undefined}
+      data-active={item.link.indexOf(location.pathname) > -1 || undefined}
     >
-      {link.label}
+      {item.label}
     </NavLink>
 
+    // <a
+    //   key=
+    //   href=
+    //   className={classes.link}
+    //   data-active={active === link.link || undefined}
+    //   onClick={(event) => {
+    //     event.preventDefault();
+    //     setActive(link.link);
+    //   }}
+    // >
+    //   {link.label}
+    // </a>
   ));
 
   return (
